@@ -108,7 +108,33 @@
       ]
     };
 
-    const fairies = ["Блум 🔥", "Стелла 🌟", "Флора 🌸", "Муза 🎵", "Текна 🤖", "Лейла 🌊"];
+    const fairies = [
+  {
+    name: "Блум 🔥",
+    img: "https://static.wikia.nocookie.net/winx/images/e/e6/Bloom_enchantix.png"
+  },
+  {
+    name: "Стелла 🌟",
+    img: "https://static.wikia.nocookie.net/winx/images/1/13/Stella_enchantix.png"
+  },
+  {
+    name: "Флора 🌸",
+    img: "https://static.wikia.nocookie.net/winx/images/6/64/Flora_enchantix.png"
+  },
+  {
+    name: "Муза 🎵",
+    img: "https://static.wikia.nocookie.net/winx/images/f/fd/Musa_enchantix.png"
+  },
+  {
+    name: "Текна 🤖",
+    img: "https://static.wikia.nocookie.net/winx/images/5/58/Tecna_enchantix.png"
+  },
+  {
+    name: "Лейла 🌊",
+    img: "https://static.wikia.nocookie.net/winx/images/6/64/Layla_enchantix.png"
+  }
+];
+
     let selectedTopic = "";
     let answers = [];
 
@@ -148,13 +174,16 @@
       }
     }
 
-    function showResult() {
-      document.getElementById("quiz").classList.add("hidden");
-      const resultDiv = document.getElementById("result");
-      const randomFairy = fairies[Math.floor(Math.random() * fairies.length)];
-      resultDiv.innerHTML = `✨ Ты — <strong>${randomFairy}</strong>! ✨`;
-      resultDiv.classList.remove("hidden");
-    }
+   function showResult() {
+  document.getElementById("quiz").classList.add("hidden");
+  const resultDiv = document.getElementById("result");
+  const fairy = fairies[Math.floor(Math.random() * fairies.length)];
+  resultDiv.innerHTML = `
+    <p>✨ Ты — <strong>${fairy.name}</strong>! ✨</p>
+    <img src="${fairy.img}" alt="${fairy.name}" style="max-width: 100%; border-radius: 1rem; box-shadow: 0 0 15px white; margin-top: 1rem;">
+  `;
+  resultDiv.classList.remove("hidden");
+}
   </script>
 
 </body>
