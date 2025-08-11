@@ -39,13 +39,13 @@
       border-radius: 0.5rem;
     }
     .question {
-      margin: 1.5rem 0;
+      margin: 1.2rem 0;
     }
     .hidden {
       display: none;
     }
     .result {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       font-weight: bold;
       text-align: center;
     }
@@ -72,12 +72,14 @@
         <option value="sales">Продажи</option>
       </select>
       <br>
-      <button onclick="startTest()">Начать тест</button>
+      <button id="startBtn" type="button">Начать тест</button>
     </div>
     <div id="quiz" class="hidden"></div>
     <div id="result" class="hidden result"></div>
   </div>
+
   <script>
+    // Вопросы — по 10 на каждую тему
     const questions = {
       code: [
         { q: "Какой язык ты выберешь?", options: ["Python", "JavaScript", "C++"] },
@@ -144,11 +146,11 @@
         { q: "Что важнее в продажах?", options: ["Отношения", "Цена", "Качество продукта"] },
         { q: "Как ты работаешь с возражениями?", options: ["Аргументы", "Скидки", "Обход"] },
         { q: "Как ты презентуешь продукт?", options: ["Эмоционально", "Технически", "Коротко"] },
-        { q: "Как ты ведешь клиента?", options: ["Пошагово", "Гибко", "Импровизирую"] },
+        { q: "Как ты ведёшь клиента?", options: ["Пошагово", "Гибко", "Импровизирую"] },
         { q: "Как ты относишься к KPI?", options: ["Мотивируют", "Давят", "Нейтрально"] },
-        { q: "Как ты работаешь с долгосрочными клиентами?", options: ["Поддерживаю связь", "Редко общаюсь", "Только по делу"] },
+        { q: "Как работаешь с долгосрочными клиентами?", options: ["Поддерживаю связь", "Редко общаюсь", "Только по делу"] },
         { q: "Как реагируешь на отказ?", options: ["Ищу причину", "Перехожу к следующему", "Пытаюсь вернуть"] },
-        { q: "Как ты ищешь новые возможности?", options: ["Нетворкинг", "Исследование рынка", "Случайно"] },
+        { q: "Как ищешь новые возможности?", options: ["Нетворкинг", "Исследование рынка", "Случайно"] },
         { q: "Что важнее для сделки?", options: ["Доверие", "Сроки", "Цена"] }
       ]
     };
@@ -165,10 +167,13 @@
     let selectedTopic = "";
     let answers = [];
 
+    // Привязываем кнопку через JS (без inline onclick)
+    document.getElementById('startBtn').addEventListener('click', startTest);
+
     function startTest() {
       const topicSelect = document.getElementById("topic");
       selectedTopic = topicSelect.value;
-      if (!selectedTopic) {
+      if (!selectedTopic || !questions[selectedTopic]) {
         alert("Пожалуйста, выбери тему!");
         return;
       }
@@ -179,24 +184,49 @@
 
     function showQuestion(index) {
       const quizDiv = document.getElementById("quiz");
-      const question = questions[selectedTopic][index];
-      quizDiv.innerHTML = `
-        <div class="question">
-          <h2>Вопрос ${index + 1} из ${questions[selectedTopic].length}</h2>
-          <p>${question.q}</p>
-          ${question.options.map(opt => `<button onclick="answerQuestion(${index}, '${opt}')">${opt}</button>`).join("<br>")}
-        </div>
-      `;
-      quizDiv.classList.remove("hidden");
+      const qArr = questions[selectedTopic];
+      if (!qArr) {
+        console.error("Тема не найдена:", selectedTopic);
+        alert("Ошибка: тема не найдена.");
+        return;
+      }
+      if (index >= qArr.length) {
+        showResult();
+        return;
+      }
+
+      const question = qArr[index];
+      quizDiv.innerHTML = ""; // очищаем перед отрисовкой
+
+      const container = document.createElement('div');
+      container.className = 'question';
+
+      const header = document.createElement('h2');
+      header.textContent = `Вопрос ${index + 1} из ${qArr.length}`;
+      container.appendChild(header);
+
+      const p = document.createElement('p');
+      p.textContent = question.q;
+      container.appendChild(p);
+
+      // создаём кнопки безопасно (без внедрения кавычек)
+      question.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = opt;
+        btn.style.display = 'block';
+        btn.style.marginTop = '0.5rem';
+        btn.addEventListener('click', () => answerQuestion(index, opt));
+        container.appendChild(btn);
+      });
+
+      quizDiv.appendChild(container);
+      quizDiv.classList.remove('hidden');
     }
 
     function answerQuestion(index, answer) {
       answers.push(answer);
-      if (index + 1 < questions[selectedTopic].length) {
-        showQuestion(index + 1);
-      } else {
-        showResult();
-      }
+      showQuestion(index + 1);
     }
 
     function showResult() {
@@ -206,9 +236,13 @@
       resultDiv.innerHTML = `
         <p>✨ Ты — <strong>${fairy.name}</strong>! ✨</p>
         <img src="${fairy.img}" alt="${fairy.name}">
-        <br><button onclick="location.reload()">Пройти снова</button>
+        <br><button id="retryBtn" type="button">Пройти снова</button>
       `;
-      resultDiv.classList.remove("hidden");
+      document.getElementById("retryBtn").addEventListener('click', () => {
+        // обновляем страницу или можно вернуть старт
+        location.reload();
+      });
+      resultDiv.classList.remove('hidden');
     }
   </script>
 </body>
